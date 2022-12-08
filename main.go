@@ -5,17 +5,17 @@ import (
 	"log"
 
 	"github.com/Atlasp/simas_bank/api"
+	configuration "github.com/Atlasp/simas_bank/config"
 	db "github.com/Atlasp/simas_bank/db/sqlc"
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:root@localhost:5432/simple_bank?sslmode=disable"
-)
-
 func main() {
-	conn, err := sql.Open(dbDriver, dbSource)
+	config, err := configuration.Load(".")
+	if err != nil {
+		log.Fatal("cannot load configurations:", err)
+	}
+	conn, err := sql.Open(config.DBdriver, config.DBsource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
@@ -23,7 +23,7 @@ func main() {
 
 	server := api.NewServer(store)
 
-	err = server.Start(":8080")
+	err = server.Start(config.ServerAddress)
 	if err != nil {
 		log.Fatal("cannot start server: ", err)
 	}

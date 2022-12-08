@@ -6,20 +6,19 @@ import (
 	"os"
 	"testing"
 
+	configuration "github.com/Atlasp/simas_bank/config"
 	_ "github.com/lib/pq"
 )
 
 var testQueries *Queries
 var testDB *sql.DB
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:root@localhost:5432/simple_bank?sslmode=disable"
-)
-
 func TestMain(m *testing.M) {
-	var err error
-	testDB, err = sql.Open(dbDriver, dbSource)
+	config, err := configuration.Load("../..")
+	if err != nil {
+		log.Fatal("cannot load configurations:", err)
+	}
+	testDB, err = sql.Open(config.DBdriver, config.DBsource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
